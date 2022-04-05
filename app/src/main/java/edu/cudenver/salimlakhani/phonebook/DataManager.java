@@ -37,7 +37,26 @@ public class DataManager {
             Log.i ("info", e.getMessage());
         }
 
-        Log.i ("info", "Loaded data " + cursor.getCount());
+        //Log.i ("info", "Loaded data " + cursor.getCount());
+        return cursor;
+    }
+
+
+
+    public Cursor selectAllByState (String state) {
+
+        Cursor cursor = null;
+
+        try {
+            String query = "select * from contact where state = '" + state + "' order by name";
+            cursor = db.rawQuery(query, null);
+        }
+        catch (Exception e) {
+            Log.i ("info", "In DataManager selectAll method");
+            Log.i ("info", e.getMessage());
+        }
+
+        //Log.i ("info", "Loaded data " + cursor.getCount());
         return cursor;
     }
 
@@ -88,10 +107,6 @@ public class DataManager {
      */
     private class MySQLiteOpenHelper extends SQLiteOpenHelper {
 
-        /**
-         * Constructor os used to initialize the database name, and version number
-         * @param context
-         */
         public MySQLiteOpenHelper (Context context) {
             super(context, "address_book", null, 1);
 
@@ -104,7 +119,7 @@ public class DataManager {
         public void onCreate (SQLiteDatabase db) {
 
             try {
-                String newTable = "create table contact ("
+                String newTable = "create table contact  ("
                         + "_id integer primary key autoincrement not null, "
                         + "name text not null, "
                         + "phone text, "

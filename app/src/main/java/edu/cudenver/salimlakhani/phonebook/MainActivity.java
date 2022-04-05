@@ -2,6 +2,7 @@ package edu.cudenver.salimlakhani.phonebook;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -36,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
 
+    private DataManager dm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //setContentView(R.layout.activity_main);
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
 
         list = new ArrayList<Contact>();
+        dm = new DataManager(this);
 
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,12 +115,59 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addContact (Contact contact) {
-        list.add(contact);
-        Log.i ("info", "Number of Contacts " + list.size());
-        contactAdapter.notifyDataSetChanged();
+        //list.add(contact);
+        String name = contact.getName();
+        String phone = contact.getPhone();
+        String email = contact.getEmail();
+        String street = contact.getAddress();
+        String city = contact.getCity();
+        String state = contact.getState();
+        String zip = contact.getZip();
+        String contactType = contact.getContacttype();
+
+        dm.insert(name, phone, email, street, city, state, zip, contactType);
+        //Log.i ("info", "Number of Contacts " + list.size());
+        //contactAdapter.notifyDataSetChanged();
+        loadData();
     }
 
     public void showContact (int contactToShow) {
         //Create object for ViewContact
+    }
+
+    public void loadData () {
+        Cursor cursor = dm.selectAll();
+
+        int contactCount = cursor.getCount();
+
+        list.clear();
+
+        if (contactCount > 0) {
+
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(0);
+                String name = cursor.getString(1);
+                String phone = cursor.getString(2);
+                String email = cursor.getString(3);
+                String street = cursor.getString(4);
+                String city = cursor.getString(5);
+                String state = cursor.getString(6);
+                String zip = cursor.getString(7);
+                String contactType = cursor.getString(8);
+
+                Contact contact = new Contact(name, phone, email, street, state, city, zip, contactType);
+
+                list.add(contact);
+            }
+
+            contactAdapter.notifyDataSetChanged();
+
+
+        }
+    }
+
+    public void onResume () {
+        super.onResume();
+        loadData();
     }
 }
